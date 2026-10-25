@@ -182,29 +182,6 @@
     },
     {
       "parameters": {
-        "fieldsToAggregate": {
-          "fieldToAggregate": [
-            {
-              "fieldToAggregate": "produto"
-            },
-            {
-              "fieldToAggregate": "mensagem"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        -576,
-        -1104
-      ],
-      "id": "de7080f5-56f3-48d4-80cf-a806feaa68a4",
-      "name": "Aggregate - Consolidar Recomendacoes por Cliente"
-    },
-    {
-      "parameters": {
         "jsCode": "\nconst items = $input.all();\nconst clientes = {};\n\nfor (const item of items) {\n  const d = item.json;\n  const chave = d.email;\n\n  if (!clientes[chave]) {\n    clientes[chave] = {\n      nome: d.nome,\n      email: d.email,\n      saldo: d.saldo,\n      perfil: d.perfil,\n      recomendacoes: []\n    };\n  }\n\n  clientes[chave].recomendacoes.push({\n    produto: d.produto,\n    minimo: d.minimo,\n    rentabilidade: d.rentabilidade,\n    mensagem: d.mensagem\n  });\n}\n\nreturn Object.values(clientes).map(cliente => ({\n  json: cliente\n}));\n"
       },
       "type": "n8n-nodes-base.code",
@@ -530,11 +507,6 @@
         ]
       ]
     },
-    "Aggregate - Consolidar Recomendacoes por Cliente": {
-      "main": [
-        []
-      ]
-    },
     "Edit Fields - Gerar Mensagem": {
       "main": [
         [
@@ -564,7 +536,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "857a118f-9de7-4847-a5c0-2886cdc0db67",
+  "versionId": "15ff7e54-322c-4b69-8ca0-60e11e83c3dc",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9ec0af386e6023071f97c541f752940195ea84fd80b0df1b67a999dd86d3ece5"
