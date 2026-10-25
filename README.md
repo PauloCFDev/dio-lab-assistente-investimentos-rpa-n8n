@@ -296,7 +296,7 @@ Possíveis evoluções incluem:
 ### 8. Arquivos da implementação
 
 - `n8n/workflow.json`: exportação do workflow implementado.
-- `evidencia-workflow.png`: captura de tela da execução do workflow.
+- `Evidencia_Workflow.PNG`: captura de tela da execução do workflow.
 
 ---
 
