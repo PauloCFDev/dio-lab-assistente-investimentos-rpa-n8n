@@ -170,3 +170,134 @@ Conecte o Agente de IA do N8N a um modelo como Gemini ou GPT para:
 **Bons estudos e mãos à obra** 🚀
 
 Se tiver dúvidas, lembre-se: a melhor forma de aprender é experimentando. Erre, corrija e celebre cada pequena vitória no caminho.
+
+
+---
+
+---
+
+## Implementação realizada
+
+### 1. Visão geral
+
+Foi implementada a versão MVP (Mínimo Viável) do Assistente de Investimentos, utilizando Python, n8n, GitHub Pages, ngrok e Google Sheets.
+
+A automação coleta os dados de clientes fictícios publicados em uma página web, envia essas informações ao n8n por meio de um Webhook, cruza o perfil de cada cliente com um catálogo de investimentos e gera mensagens estáticas de recomendação.
+
+Ao final, os resultados são registrados no Google Sheets, com uma linha por cliente e três opções de investimento por perfil.
+
+### 2. Arquitetura implementada
+
+O fluxo utiliza duas fontes de dados:
+
+- **Clientes:** extraídos da página HTML publicada no GitHub Pages, utilizando Python, `requests` e BeautifulSoup no Google Colab.
+- **Catálogo de investimentos:** arquivo CSV publicado no GitHub Pages e carregado pelo n8n por meio de uma requisição HTTP.
+
+O envio dos clientes ao n8n é realizado por uma requisição HTTP POST. Como o n8n está instalado localmente, foi utilizado o ngrok para disponibilizar temporariamente um endereço HTTPS que encaminha as requisições ao ambiente local.
+
+O workflow executa as seguintes etapas:
+
+1. Recebe os dados dos clientes pelo Webhook.
+2. Separa os clientes individualmente.
+3. Organiza os campos de nome, e-mail, saldo e perfil.
+4. Baixa o catálogo de investimentos em CSV.
+5. Extrai os registros do catálogo.
+6. Combina clientes e produtos utilizando o campo `perfil`, mantendo apenas as correspondências.
+7. Prepara os dados das recomendações.
+8. Gera uma mensagem estática para cada combinação de cliente e produto.
+9. Agrupa as três recomendações de cada cliente em um único registro.
+10. Grava os resultados no Google Sheets.
+
+### 3. Principais decisões técnicas
+
+**Integração por Webhook**
+
+O Webhook recebe os dados em formato JSON. O Python envia a lista de clientes em uma requisição POST, permitindo iniciar o processamento no n8n.
+
+**Leitura do catálogo CSV**
+
+O catálogo é obtido por uma requisição HTTP GET. O arquivo é processado pelo nó Extract From File, configurado para extrair os registros do CSV.
+
+**Combinação por perfil**
+
+O nó Merge utiliza o modo de combinação por campos correspondentes, comparando o perfil do cliente com o perfil dos produtos. Dessa forma, cada cliente recebe as opções associadas ao seu perfil de investidor.
+
+**Geração das mensagens**
+
+Na versão MVP, as mensagens são produzidas por uma expressão no n8n, utilizando o nome do cliente, o perfil, o produto, o valor mínimo informado e a rentabilidade indicada no catálogo.
+
+**Consolidação das recomendações**
+
+O nó Code agrupa os resultados pelo e-mail do cliente. Essa abordagem permite transformar os três registros de recomendação de cada cliente em um único registro com três opções, facilitando a gravação na planilha.
+
+**Registro no Google Sheets**
+
+O nó Google Sheets utiliza a operação Append Row para registrar os resultados. As colunas incluem os dados do cliente e os campos de produto, valor mínimo, rentabilidade e mensagem para cada uma das três recomendações.
+
+### 4. Ambiente utilizado
+
+- **Sistema operacional:** Windows 10.
+- **Orquestração:** n8n executado localmente com Docker Desktop e WSL2.
+- **Extração de dados:** Python no Google Colab.
+- **Bibliotecas Python:** `requests` e BeautifulSoup (`bs4`).
+- **Conectividade:** ngrok, para encaminhamento temporário das requisições ao Webhook local.
+- **Fonte de dados:** GitHub Pages, com página HTML de clientes e catálogo CSV.
+- **Destino dos resultados:** Google Sheets, por meio de credenciais OAuth 2.0.
+
+### 5. Como executar
+
+1. Disponibilize a página HTML dos clientes e o arquivo CSV do catálogo no GitHub Pages.
+2. Inicie o Docker Desktop e confirme que o n8n local está acessível.
+3. Inicie o ngrok apontando para a porta utilizada pelo n8n.
+4. Abra o workflow no n8n e prepare o Webhook para receber uma requisição de teste ou utilize a URL de produção, conforme a configuração adotada.
+5. Configure no notebook Python a URL correspondente do Webhook.
+6. Execute o notebook no Google Colab para extrair os clientes e enviar os dados ao n8n.
+7. Acompanhe a execução do workflow e verifique os resultados no Google Sheets.
+
+**Observações importantes:**
+
+- O endereço do ngrok pode mudar quando o túnel é reiniciado. Nesse caso, atualize a URL utilizada no notebook Python.
+- Para chamadas ao Webhook de teste, o n8n precisa estar aguardando uma requisição. A URL de teste não deve ser confundida com a URL de produção.
+- O túnel do ngrok precisa permanecer ativo durante a execução.
+- Não publique tokens de autenticação, credenciais OAuth ou outros segredos no repositório.
+- Para repetir o teste utilizando Append Row, limpe previamente os registros de teste ou utilize outra aba da planilha, evitando duplicidades.
+
+### 6. Validação e resultados
+
+Foi realizado um teste de ponta a ponta, com os seguintes resultados:
+
+| Indicador | Resultado |
+|---|---:|
+| Clientes processados | 10 |
+| Perfis de investimento | 3 |
+| Recomendações geradas | 30 |
+| Mensagens geradas | 30 |
+| Linhas registradas no Google Sheets | 10 |
+| Erros observados na execução validada | 0 |
+
+Cada cliente recebeu três recomendações correspondentes ao seu perfil, e os resultados foram consolidados em uma única linha da planilha.
+
+A execução foi validada visualmente no n8n, com os nós concluindo o processamento com sucesso. Uma captura de tela da execução foi incluída no repositório como evidência.
+
+### 7. Limitações e próximos passos
+
+Esta implementação corresponde ao MVP com mensagens estáticas. Embora as mensagens sejam personalizadas com dados do cliente e do produto, elas são geradas por um template fixo, sem utilização de um modelo de linguagem.
+
+Possíveis evoluções incluem:
+
+- Integrar um agente de IA generativa utilizando um modelo compatível, como Gemini ou GPT.
+- Gerar mensagens mais naturais e adaptadas ao contexto de cada cliente.
+- Adicionar validações para dados incompletos ou perfis sem produtos correspondentes.
+- Implementar tratamento de erros, registros de execução e mecanismos para evitar duplicidade de gravações.
+- Melhorar a documentação e acrescentar novas evidências de execução.
+
+**Nota:** as opções e rentabilidades presentes no catálogo são dados de demonstração do projeto. As mensagens geradas têm finalidade educacional e não constituem recomendação financeira profissional.
+
+### 8. Arquivos da implementação
+
+- `n8n/workflow.json`: exportação do workflow implementado.
+- `evidencia-workflow.png`: captura de tela da execução do workflow.
+
+---
+
+**Status do projeto:** MVP implementado e validado em ambiente local, com integração funcional entre Python, Webhook, n8n e Google Sheets. A integração com IA generativa permanece como evolução futura.
