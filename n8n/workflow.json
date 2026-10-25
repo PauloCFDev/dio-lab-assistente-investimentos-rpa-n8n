@@ -1,0 +1,575 @@
+{
+  "name": "Assistente de Investimentos - DIO",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64b3e709-5659-464c-aa0c-3dd3d1dfd390",
+              "name": "=nome",
+              "value": "={{ $json.nome }}",
+              "type": "string"
+            },
+            {
+              "id": "aab58537-cfb0-47f7-b630-6ed28add4378",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d9b0b168-2330-4d56-8acf-b4ee50b3c4ee",
+              "name": "saldo",
+              "value": "={{ $json.saldo }}",
+              "type": "string"
+            },
+            {
+              "id": "a8b3e90f-bd34-49c3-820b-953631b68aa9",
+              "name": "perfil",
+              "value": "={{ $json.perfil }}",
+              "type": "string"
+            },
+            {
+              "id": "2a37cdd8-a2e9-43e6-ba4d-404a8613e469",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "e3145cbf-c484-4c56-8a21-079de8528325",
+              "name": "minimo",
+              "value": "={{ $json.minimo }}",
+              "type": "string"
+            },
+            {
+              "id": "742338ac-6fb4-4779-ac49-b09a39c06d5d",
+              "name": "rentabilidade",
+              "value": "={{ $json.rentabilidade }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1632,
+        -752
+      ],
+      "id": "04724438-ca5d-4035-9d30-4b724f39a78e",
+      "name": "Edit Fields Preparar Recomendacao"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "assistente-investimentos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1632,
+        -1040
+      ],
+      "id": "cea02a5e-99f7-4c70-9e8a-fdfbda0660e9",
+      "name": "Webhook - Receber Clientes",
+      "webhookId": "53db5b47-7d97-42ab-8849-787d761301fa"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.clientes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1408,
+        -1136
+      ],
+      "id": "d85dd4a6-324f-4e1f-bd7c-5dfb6c1621d0",
+      "name": "Split Out - Separar Clientes"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1a9ef11-388b-44a1-afbc-531964cbc55b",
+              "name": "=nome",
+              "value": "={{ $json.nome }}",
+              "type": "string"
+            },
+            {
+              "id": "8a930ee9-b5df-4eed-b044-3ef8e29663d4",
+              "name": "=email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "584a6580-ccbb-46d1-b8c3-37276721e47b",
+              "name": "=saldo",
+              "value": "={{ $json.saldo }}",
+              "type": "string"
+            },
+            {
+              "id": "1b7fe8cc-0327-43b2-a779-f79781fe6ce1",
+              "name": "=perfil",
+              "value": "={{ $json.perfil }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1184,
+        -1136
+      ],
+      "id": "8c5951e0-d573-40b1-a454-62fe818eb69e",
+      "name": "Edit Fields - Organizar Dados Clientes"
+    },
+    {
+      "parameters": {
+        "url": "https://paulocfdev.github.io/dio-lab-assistente-investimentos-rpa-n8n/data.csv",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -1408,
+        -944
+      ],
+      "id": "8b431a52-31cb-4b9e-877e-6a89f2286608",
+      "name": "HTTP Request - Buscar Catalogo Investimentos",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1184,
+        -944
+      ],
+      "id": "fd779333-f726-4469-bbc4-e0753877befb",
+      "name": "Extract From File - Ler Catalogo CSV"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "perfil, perfil",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -960,
+        -1040
+      ],
+      "id": "00611231-1c89-4199-bc09-44c57b33df1b",
+      "name": "Merge - Cruzar Perfil e Produtos"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "produto"
+            },
+            {
+              "fieldToAggregate": "mensagem"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -1104
+      ],
+      "id": "de7080f5-56f3-48d4-80cf-a806feaa68a4",
+      "name": "Aggregate - Consolidar Recomendacoes por Cliente"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\nconst clientes = {};\n\nfor (const item of items) {\n  const d = item.json;\n  const chave = d.email;\n\n  if (!clientes[chave]) {\n    clientes[chave] = {\n      nome: d.nome,\n      email: d.email,\n      saldo: d.saldo,\n      perfil: d.perfil,\n      recomendacoes: []\n    };\n  }\n\n  clientes[chave].recomendacoes.push({\n    produto: d.produto,\n    minimo: d.minimo,\n    rentabilidade: d.rentabilidade,\n    mensagem: d.mensagem\n  });\n}\n\nreturn Object.values(clientes).map(cliente => ({\n  json: cliente\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        -752
+      ],
+      "id": "c1bdb411-1279-4c1e-aa57-58351f5ebcb7",
+      "name": "Code - Agrupar Recomendacoes por Cliente",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ec9176b-4c5c-4c80-be60-bb2e39ac279b",
+              "name": "mensagem",
+              "value": "={{   'Olá, ' + $json.nome + '! ' +   'Considerando seu perfil ' + $json.perfil +   ', temos uma opção de investimento para você: ' +   $json.produto + '. ' +   'Valor mínimo informado: R$ ' + $json.minimo +   '. Rentabilidade indicada no catálogo: ' +   $json.rentabilidade + '.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1472,
+        -752
+      ],
+      "id": "c63fbbea-932b-4a4c-9f69-307662bed78f",
+      "name": "Edit Fields - Gerar Mensagem"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WMMB5wGL34Iyh0OjpMRPaeCAl99LFXaBzu0w-K2EYG8",
+          "mode": "list",
+          "cachedResultName": "DIO - Assistente de Investimentos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WMMB5wGL34Iyh0OjpMRPaeCAl99LFXaBzu0w-K2EYG8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Recomendacoes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WMMB5wGL34Iyh0OjpMRPaeCAl99LFXaBzu0w-K2EYG8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nome": "={{ $json.nome }}",
+            "Email": "={{ $json.email }}",
+            "Saldo": "={{ $json.saldo }}",
+            "Perfil": "={{ $json.perfil }}",
+            "Produto 1": "={{ $json.recomendacoes[0].produto }}",
+            "Valor Minimo 1": "={{ $json.recomendacoes[0].minimo }}",
+            "Rentabilidade 1": "={{ $json.recomendacoes[0].rentabilidade }}",
+            "Mensagem 1": "={{ $json.recomendacoes[0].mensagem }}",
+            "Produto 2": "={{ $json.recomendacoes[1].produto }}",
+            "Valor Minimo 2": "={{ $json.recomendacoes[1].minimo }}",
+            "Rentabilidade 2": "={{ $json.recomendacoes[1].rentabilidade }}",
+            "Mensagem 2": "={{ $json.recomendacoes[1].mensagem }}",
+            "Produto 3": "={{ $json.recomendacoes[2].produto }}",
+            "Valor Minimo 3": "={{ $json.recomendacoes[2].minimo }}",
+            "Rentabilidade 3": "={{ $json.recomendacoes[2].rentabilidade }}",
+            "Mensagem 3": "={{ $json.recomendacoes[2].mensagem }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nome",
+              "displayName": "Nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Saldo",
+              "displayName": "Saldo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Perfil",
+              "displayName": "Perfil",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Produto 1",
+              "displayName": "Produto 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor Minimo 1",
+              "displayName": "Valor Minimo 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rentabilidade 1",
+              "displayName": "Rentabilidade 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensagem 1",
+              "displayName": "Mensagem 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Produto 2",
+              "displayName": "Produto 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor Minimo 2",
+              "displayName": "Valor Minimo 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rentabilidade 2",
+              "displayName": "Rentabilidade 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensagem 2",
+              "displayName": "Mensagem 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Produto 3",
+              "displayName": "Produto 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor Minimo 3",
+              "displayName": "Valor Minimo 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rentabilidade 3",
+              "displayName": "Rentabilidade 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensagem 3",
+              "displayName": "Mensagem 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1056,
+        -752
+      ],
+      "id": "152fe5b3-1adc-45b3-a18e-4ac7bb9655a1",
+      "name": "Google Sheets - Append -  Registrar Recomendacoes",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "lqPHOWqUNPg4LjOO",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Receber Clientes": {
+      "main": [
+        [
+          {
+            "node": "Split Out - Separar Clientes",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request - Buscar Catalogo Investimentos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out - Separar Clientes": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields - Organizar Dados Clientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields - Organizar Dados Clientes": {
+      "main": [
+        [
+          {
+            "node": "Merge - Cruzar Perfil e Produtos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Buscar Catalogo Investimentos": {
+      "main": [
+        [
+          {
+            "node": "Extract From File - Ler Catalogo CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract From File - Ler Catalogo CSV": {
+      "main": [
+        [
+          {
+            "node": "Merge - Cruzar Perfil e Produtos",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge - Cruzar Perfil e Produtos": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields Preparar Recomendacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields Preparar Recomendacao": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields - Gerar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate - Consolidar Recomendacoes por Cliente": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields - Gerar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Code - Agrupar Recomendacoes por Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Agrupar Recomendacoes por Cliente": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Append -  Registrar Recomendacoes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "857a118f-9de7-4847-a5c0-2886cdc0db67",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9ec0af386e6023071f97c541f752940195ea84fd80b0df1b67a999dd86d3ece5"
+  },
+  "nodeGroups": [],
+  "id": "INnmrkrw1IsUm2P3",
+  "tags": []
+}
